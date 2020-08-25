@@ -485,9 +485,20 @@ var jFieldDefaults = {
                 fn.closeDrop($(document).find(".jfield"));
                 if (evt.which === 1) fn.openDrop($field, options);
             });
-            $(document).on('click', function(evt) {
+            $(document).on('mouseup', function(evt) {
                 var cls = jFieldDefaults.dropdown.attr.class;
-                if ($(evt.target).hasClass(cls)) return false;  // We want it open on this condition
+                
+                var is_ul = $(evt.target).prop("tagName") == "UL";
+                var $ulParentSelect = $(evt.target).parent().prev();
+
+                var is_li = $(evt.target).prop("tagName") == "LI";
+                var $liParentSelect = $(evt.target).parent().parent().prev();
+
+                if (
+                    ($(evt.target).hasClass(cls) && !is_li && !is_ul) || 
+                    (is_li && $liParentSelect.hasClass(cls) && !is_ul) || 
+                    (!is_li && is_ul && $ulParentSelect.hasClass(cls) )  
+                ) return false;  // We want it open on these conditions
                 fn.closeDrop($field);
             });
 
