@@ -21,8 +21,10 @@
 .jcheckbox input ~ span:before { content: "\f00c"; font-size: 80%; padding: 2px; width: 10px; }
 /* Dropdown */
 .jdropdown { padding: 2px 5px; width: 100px; }
+select.jdropdown::-ms-expand { display: none; }  /* IE select change */
 .jdropdown-menu { background: #FFFFFF; border: 1px solid #000000; }
 .jdropdown-menu ul { list-style: none; padding: 3px; margin: 0; }
+.jdropdown-menu li.disabled{color:grey;cursor: default;}
 /* Button */
 .jbutton { cursor: pointer; }
 /* Default states */

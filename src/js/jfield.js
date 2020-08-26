@@ -176,24 +176,41 @@ var jFieldDefaults = {
                     var value = String(values[i]);
                     var $li;
                     var lbl;
+                    var $option = $field.find("option[value="+value+"]");
+                    var disabled = $option.prop("data-disabled")
+                    var message = $option.prop("data-message")
                     // array of labels will substitute values
                     if (Array.isArray(labels)) {
                         $li = $("<li></li>");
                         lbl = (!!labels[i]) ? labels[i] : value;
                         $li.data('value', value).text(lbl);
+                        if(disabled){
+                            $li.addClass("disabled")
+                        }
+                        if(message){
+                            $li.prop("title",message)
+                        }
                         $menu.find("ul").append($li);
                     } else {
                         $li = $("<li></li>");
                         $li.text(value).data('value', value);
+                        if(disabled){
+                            $li.addClass("disabled")
+                        }
+                        if(message){
+                            $li.prop("title",message)
+                        }
                         $menu.find("ul").append($li);
                     }
                 }
                 // events
                 $menu.find("li").on("click", function() {
-                    var data = $(this).data('value');
-                    $field.find("select").val(data);
-                    $field.find("select").trigger("change");
-                    $menu.hide();
+                    if(!$(this).hasClass("disabled")){
+                        var data = $(this).data('value');
+                        $field.find("select").val(data);
+                        $field.find("select").trigger("change");
+                        $menu.hide();
+                    }
                 });
             }
 
@@ -637,6 +654,46 @@ var jFieldDefaults = {
             $parent.off('field-updated');
         }
     };
+    // disable drop down item 
+    function disable($elem,options){
+        if(typeof(options) == "string"){
+            var value = options;
+            var message = null;
+        }else{
+            var value = options.value;
+            var message = options.message;
+
+        }
+        var $select = $elem.find("select");
+        var $list = $elem.find("ul");
+        if($select.length == 0){
+            throw "Disabling can only be performed on dropdown jfield types"
+        }
+        var $v = $select.find("option[value="+value+"]");
+        if($v.length == 0){
+            throw "Cannot find a item with the value '"+value+"'";
+        }
+        $v.prop("data-disabled",true);
+        if(message != null){
+            $v.prop("data-message",message);
+
+        }
+        return true
+    }
+    function enable($elem,value){
+        var $select = $elem.find("select");
+        var $list = $elem.find("ul");
+        if($select.length == 0){
+            throw "Disabling can only be performed on dropdown jfield types"
+        }
+        var $v = $select.find("option[value="+value+"]");
+        if($v.length == 0){
+            throw "Cannot find a item with the value '"+value+"'";
+        }
+        $v.removeProp("data-disabled");
+        $v.removeProp("data-message")
+        return true
+    }
     // plugin
     $.fn.jfield = function(action, options) {
         switch (action) {
@@ -645,6 +702,11 @@ var jFieldDefaults = {
                 break;
             case "getValue":  // Get the value (json style)
                 return getValue($(this), options);
+            case "disable":
+                return disable($(this),options)
+            case "enable":
+                return enable($(this),options)
+
             default:
                 return this.each(function(i, el) {
                     switch (action) {
